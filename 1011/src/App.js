@@ -35,6 +35,11 @@ function App() {
     setTodos(todos.filter((todo) => todo.id !== id));
   };
 
+  const [sortByChecked, setSortByChecked] = useState(false);
+  const displayedTodos = sortByChecked
+  ? [...todos].sort((a,b) => Number(a.checked) - Number(b.checked))
+  : todos;
+
   return (
     <div style={{ padding: "20px" }}>
       <h1>TODOアプリ</h1>
@@ -44,9 +49,12 @@ function App() {
         placeholder="TODOを入力"
       />
       <button onClick={addTodo}>追加</button>
+      <button onClick={() => setSortByChecked(!sortByChecked)}>
+        {sortByChecked ? "並べ替え解除":"チェック済みを後ろに"}
+      </button>
 
       <ul>
-        {todos.map((todo) => (
+        {displayedTodos.map((todo) => (
           <li key={todo.id}>
             <label>
               <input
