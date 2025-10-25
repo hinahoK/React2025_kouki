@@ -18,6 +18,7 @@ function App() {
       id: Date.now(),
       text: input,
       checked: false,
+      date: new Date().toISOString(),
     };
     setTodos([...todos, newTodo]);
     setInput("");
@@ -36,9 +37,22 @@ function App() {
   };
 
   const [sortByChecked, setSortByChecked] = useState(false);
-  const displayedTodos = sortByChecked
-  ? [...todos].sort((a,b) => Number(a.checked) - Number(b.checked))
-  : todos;
+  const [sortByDate, setSortByDate] = useState(false);
+
+  // const displayedTodos = sortByChecked
+  // ? [...todos].sort((a,b) => Number(a.checked) - Number(b.checked))
+  // : todos;
+
+  const displayedTodos = [...todos]
+  .sort((a,b) => {
+    if (sortByChecked){
+      return Number(a.checked) - Number(b.checked);
+    }
+    if (sortByDate){
+      return new Date(a.date) - new Date(b.Date);
+    }
+    return 0;
+  });
 
   return (
     <div style={{ padding: "20px" }}>
@@ -52,6 +66,9 @@ function App() {
       <button onClick={() => setSortByChecked(!sortByChecked)}>
         {sortByChecked ? "並べ替え解除":"チェック済みを後ろに"}
       </button>
+      <button onClick={() => setSortByDate(!sortByDate)}>
+        {sortByDate ? "日付を解除" : "日付順に並べる"}
+      </button>
 
       <ul>
         {displayedTodos.map((todo) => (
@@ -63,6 +80,9 @@ function App() {
                 onChange={() => toggleCheck(todo.id)}
               />
               {todo.text}
+              <span style={{ marginLeft: "10px", fontSize: "0.8em", color: "#666" }}>
+                 ({new Date(todo.date).toLocaleDateString()})
+              </span>
             </label>
             <button onClick={() => deleteTodo(todo.id)}>削除</button>
           </li>
