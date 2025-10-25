@@ -19,9 +19,24 @@ function App() {
       text: input,
       checked: false,
       date: new Date().toISOString(),
+      subTodos: [],
     };
     setTodos([...todos, newTodo]);
     setInput("");
+  };
+
+  const addSubTodo = (parentId, subText) => {
+    if (!subText.trim()) return;
+    const newSub = {
+      id: Date.now(),
+      text: subText,
+      checked: false,
+    };
+    setTodos(todos.map(todo =>
+      todo.id === parentId
+      ? {...todo, subTodos: [...todo.subTodos, newSub]}
+      : todo
+    ));
   };
 
   const toggleCheck = (id) => {
@@ -49,10 +64,29 @@ function App() {
       return Number(a.checked) - Number(b.checked);
     }
     if (sortByDate){
-      return new Date(a.date) - new Date(b.Date);
+      return new Date(a.date) - new Date(b.date);
     }
     return 0;
   });
+
+const toggleSubCheck = (parentId, subId) => {
+  setTodos(todos.map(todo => {
+    if (todo.id !== parentId) return todo;
+
+    const updatedSubs = todo.subTodos.map(sub =>
+      sub.id === subId ? { ...sub, checked: !sub.checked } : sub
+    );
+
+    const allChecked = updatedSubs.every(sub => sub.checked);
+
+    return {
+      ...todo,
+      subTodos: updatedSubs,
+      checked: allChecked,
+    };
+  }));
+};
+
 
   return (
     <div style={{ padding: "20px" }}>
@@ -85,6 +119,30 @@ function App() {
               </span>
             </label>
             <button onClick={() => deleteTodo(todo.id)}>削除</button>
+
+      <ul style={{ marginLeft: "20px" }}>
+        {todo.subTodos.map((sub) => (
+          <li key={sub.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={sub.checked}
+                onChange={() => toggleSubCheck(todo.id, sub.id)}
+              />
+              {sub.text}
+            </label>
+          </li>
+        ))}
+      </ul>
+            <input
+        placeholder="サブTODOを追加"
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            addSubTodo(todo.id, e.target.value);
+            e.target.value = "";
+          }
+        }}
+      />
           </li>
         ))}
       </ul>
