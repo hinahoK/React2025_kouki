@@ -1,25 +1,41 @@
-import React, { useState, useEffect } from "react";
+// 空欄の場合は「未入力です」表示、文字数制限とカウント
+import React, { useState } from 'react';
+import { TextField, Box } from '@mui/material';
 
 function App() {
-  const [inputText, setInputText] = useState("");
-  const [log, setLog] = useState("");
+  const [form, setForm] = useState({ name: '', email: '', comment: '' });
 
-  useEffect(() => {
-    setLog(`入力内容が更新されました: ${inputText}`);
-  }, [inputText]); // inputText が変わったときだけ実行される
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // 最大文字数
+  const limits = { name: 20, email: 30, comment: 100 };
 
   return (
-    <div>
-      <h1>フォームアプリ</h1>
-      <input
-        type="text"
-        placeholder="入力してください"
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-      />
-      <p>リアルタイム表示: {inputText}</p>
-      <p>{log}</p>
-    </div>
+    <Box sx={{ p: 2 }}>
+      {/* フォーム部分 */}
+      {Object.keys(form).map((key) => (
+        <TextField
+          key={key}
+          label={key}
+          name={key}
+          value={form[key]}
+          onChange={handleChange}
+          inputProps={{ maxLength: limits[key] }}
+          helperText={`${form[key].length}/${limits[key]}文字`}
+          fullWidth
+          margin="normal"
+        />
+      ))}
+
+      {/* 表示部分 */}
+      <Box sx={{ border: '1px solid #ccc', p: 2 }}>
+        <p>名前: {form.name || '未入力です'}</p>
+        <p>メール: {form.email || '未入力です'}</p>
+        <p>コメント: {form.comment || '未入力です'}</p>
+      </Box>
+    </Box>
   );
 }
 
